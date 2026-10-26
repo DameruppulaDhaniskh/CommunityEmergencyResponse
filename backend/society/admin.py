@@ -28,3 +28,10 @@ class ResidentFlatMappingAdmin(admin.ModelAdmin):
     list_display = ('user', 'flat', 'occupancy_type', 'is_active')
     list_filter = ('occupancy_type', 'is_active')
     search_fields = ('user__email', 'flat__flat_number')
+
+
+from django.contrib import admin
+from .models import SocietyAssignment, SocietyAlertPolicy
+
+admin.site.register(SocietyAssignment)
+admin.site.register(SocietyAlertPolicy)
