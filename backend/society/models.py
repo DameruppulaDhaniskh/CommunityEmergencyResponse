@@ -121,3 +121,40 @@ class ResidentFlatMapping(models.Model):
             f"{self.user} → Flat {self.flat.flat_number}"
             f" ({self.occupancy_type})"
         )
+
+
+class SocietyAssignment(models.Model):
+    """Security personnel and volunteers assigned to a society (their service area)."""
+    society = models.ForeignKey(
+        Society, on_delete=models.CASCADE, related_name='assignments'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='society_assignments',
+        limit_choices_to={'role__in': ['security', 'volunteer']},
+    )
+    is_available = models.BooleanField(default=True)  # volunteers: currently available
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('society', 'user')
+
+    def __str__(self):
+        return f"{self.user} -> {self.society.name}"
+
+
+class SocietyAlertPolicy(models.Model):
+    """Per-society rules for who gets alerted."""
+    society = models.OneToOneField(
+        Society, on_delete=models.CASCADE, related_name='alert_policy'
+    )
+    notify_community = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'Society alert policies'
+
+    def __str__(self):
+        return f"Alert policy: {self.society.name}"
